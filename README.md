@@ -1,7 +1,3 @@
-Here’s a clean and professional **README.md** content you can use for your project:
-
----
-
 # 🚀 JobRocket
 
 **JobRocket** is a Ruby on Rails web app that helps you search and download the latest job postings scraped using the SerpAPI Google Jobs API.
