@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JobRocket</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    }
+    .job-card:hover {
+      transform: scale(1.02);
+      transition: transform 0.2s;
+    }
+    .header-title {
+      font-weight: 800;
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, #007bff, #6610f2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .form-card {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container my-5">
+    <h1 class="text-center mb-4 header-title">🚀 JobRocket</h1>
+
+    <div class="form-card">
+      <%= form_with url: '/jobs/search', method: :post, local: true, data: { turbo: false }, class: "row g-3 mb-4" do %>
+        <div class="col-12 col-md-4">
+          <%= label_tag :job_title do %>
+            <strong>Job Title</strong> (e.g. Ruby on Rails, Game developer)
+          <% end %>
+          <%= text_field_tag :job_title, params[:job_title] || 'Ruby on Rails', class: "form-control" %>
+        </div>
+        <div class="col-12 col-md-4">
+          <%= label_tag :location do %>
+            <strong>Location</strong> (city, state, country — e.g. New York, New York, United States)
+          <% end %>
+          <%= text_field_tag :location, params[:location] || 'New York, New York, United States', class: "form-control" %>
+        </div>
+        <div class="col-6 col-md-2">
+          <%= label_tag :remote do %>
+            <strong>Remote</strong> (Yes or No)
+          <% end %>
+          <%= select_tag :remote, options_for_select([['Yes', 1], ['No', 0]]), class: "form-control" %>
+        </div>
+        <div class="col-6 col-md-2">
+          <%= label_tag :language_code do %>
+            <strong>Lang Code</strong> (e.g. en)
+          <% end %>
+          <%= text_field_tag :language_code, params[:language_code] || 'en', class: "form-control" %>
+        </div>
+        <div class="col-6 col-md-2">
+          <%= label_tag :number_of_jobs do %>
+            <strong>Jobs Count</strong> (max 100)
+          <% end %>
+          <%= number_field_tag :number_of_jobs, params[:number_of_jobs] || 20, class: "form-control", min: 1, max: 100 %>
+        </div>
+        <div class="col-6 col-md-2">
+          <%= label_tag :date_posted do %>
+            <strong>Date Posted</strong>
+          <% end %>
+          <%= select_tag :date_posted,
+            options_for_select([['Past 24 Hours', 'past_24_hours'], ['Past 3 Days', 'past_3_days'], ['Past Week', 'past_week'], ['Past Month', 'past_month']], params[:date_posted] || 'past_week'),
+            class: "form-control" %>
+        </div>
+        <div class="col-12 col-md-2 align-self-end">
+        <%= submit_tag '🚀 Search Jobs', class: "btn btn-primary w-100", id: "search-button" %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @jobs.present? %>
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <h3 class="mb-2 mb-md-0">🌟 Results</h3>
+        <%= link_to '⬇️ Download as TXT', jobs_download_path(
+          job_title: params[:job_title],
+          location: params[:location],
+          remote: params[:remote],
+          language_code: params[:language_code],
+          number_of_jobs: params[:number_of_jobs],
+          date_posted: params[:date_posted]
+        ), class: 'btn btn-success', id: 'download-button', data: { turbo: false } %>
+      </div>
+
+      <div class="row">
+        <% @jobs.each_with_index do |job, index| %>
+          <div class="col-12 col-md-6 mb-3">
+            <div class="card shadow-sm job-card">
+              <div class="card-body">
+                <h5 class="card-title"><%= "#{index + 1}. #{job[:title]}" %></h5>
+                <h6 class="card-subtitle mb-2 text-muted">@<%= job[:company] %></h6>
+                <a href="<%= job[:link] %>" target="_blank" class="card-link">View Job ↗</a>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const searchButton = document.getElementById('search-button');
+      if (searchButton) {
+        searchButton.addEventListener('click', function() {
+          searchButton.value = '🔄 Loading...';
+        });
+      }
+
+      const downloadButton = document.getElementById('download-button');
+      if (downloadButton) {
+        downloadButton.addEventListener('click', function() {
+          downloadButton.innerText = '⬇️ Loading...';
+        });
+      }
+    });
+  </script>
+</body>
+</html>
