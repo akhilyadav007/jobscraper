@@ -1,5 +1,5 @@
 require 'cgi'
-require 'debug'
+require 'debug' if Rails.env.development?
 require 'dotenv'
 require 'google_search_results'
 Dotenv.load
