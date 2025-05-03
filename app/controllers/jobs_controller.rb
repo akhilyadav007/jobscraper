@@ -16,7 +16,9 @@ class JobsController < ApplicationController
 
       scraper = Engine::Google::JobScraper.new(**search_params)
       @jobs = scraper.generate_job_list(write_to_file: false)
-      Rails.cache.write("last_jobs_#{session.id}", @jobs, expires_in: 30.minutes)
+
+      # Use a fixed safe key instead of session.id to avoid cache errors
+      Rails.cache.write("last_jobs", @jobs, expires_in: 30.minutes)
     end
   end
 
@@ -34,7 +36,8 @@ class JobsController < ApplicationController
   end
 
   def download
-    jobs = Rails.cache.read("last_jobs_#{session.id}") || []
+    # Read from the fixed safe key
+    jobs = Rails.cache.read("last_jobs") || []
 
     if jobs.empty?
       redirect_to root_path, alert: "⚠️ No job results available to download. Please search first."
